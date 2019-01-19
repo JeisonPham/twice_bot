@@ -1,13 +1,14 @@
 const malScraper = require('mal-scraper')
-function display(recievedMessage, Discord) {
+function display(recievedMessage, user) {
     const command = recievedMessage.content
-    if (/myanimelist.net/.test(command)) {
+    if (command.length >= 250) return
+    else if (/myanimelist.net/.test(command)) {
         malScraper.getInfoFromURL(command)
-            .then((data) => recievedMessage.channel.send(animeEmbed(data, Discord)))
-            .catch(err => recievedMessage.reply('Url not found try again'))
+            .then((data) => recievedMessage.channel.send(animeEmbed(data, user, command)))
+            .catch(err => console.log(err))
     }
     else {
-        malScraper.getResultsFromSearch(recievedMessage.content)
+        malScraper.getResultsFromSearch(command)
             .then(search => {
                 const results = search.slice(0, search.length / 2).map((x, i) => {
                     return `${i + 1}.${x.name}`
@@ -15,21 +16,56 @@ function display(recievedMessage, Discord) {
                 recievedMessage.channel.send(results + '\nTop result\n')
                 let newMessage = recievedMessage
                 newMessage.content = search[0].url
-                display(newMessage, Discord)
+                display(newMessage, user)
             })
-            .catch(() => recievedMessage.reply('no results found please try again'))
+            .catch(err => console.log(err))
     }
 }
 
-function animeEmbed(anime, Discord) {
-    let url = `https://myanimelist.net/${anime.id}/${anime.title.split(' ').join('_')}`
-    let embed = new Discord.RichEmbed()
-        .setTitle(`English Title: ${anime.englishTitle}\n                         ${anime.title}\nJapanese Title: ${anime.japaneseTitle}\n\n${url}`)
-        .setDescription(`${anime.synopsis}\n\n[Trailer](${anime.trailer})`)
-        .setThumbnail(anime.picture)
-        .addBlankField(true)
-        .addField('Status', anime.status)
-        .addField('Score', anime.score);
+function animeEmbed(anime, user, command) {
+    const kissAnime = `https://kissanime.ru/Anime/${anime.title.replace(":", '').split(' ').join('-')}`
+    let title = ""
+    if (anime.title == anime.englishTitle || anime.englishTitle == '') {
+        title = `Title: ${anime.title}`
+    }
+    else {
+        title = `English Title: ${anime.englishTitle}\n                         ${anime.title}`
+    }
+    title += `\nJapanese Title: ${anime.japaneseTitle}`
+    const embed = {
+        embed: {
+            author: {
+                name: user.username,
+                icon_url: user.avatarURL
+            },
+            title: title,
+            url: command,
+            description: "```" + anime.synopsis + "```",
+            thumbnail: { url: anime.picture },
+            fields: [
+                {
+                    name: "Trailer",
+                    value: `[link](https://youtube.com/watch?v=${anime.trailer.match(/(?<=embed\/)(\d|\w)+/g)})`
+                },
+                {
+                    name: "KissAnime",
+                    value: `[link](${kissAnime})`
+                },
+                {
+                    name: "Status",
+                    value: anime.status
+                },
+                {
+                    name: "Score",
+                    value: anime.score
+                },
+                {
+                    name: "Episodes",
+                    value: anime.episodes
+                }
+            ]
+        }
+    }
     return embed
 
 }

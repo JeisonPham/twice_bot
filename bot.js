@@ -11,8 +11,12 @@ Client.on('ready', () => {
 
 Client.on('guildCreate', guild => {
     const guilds = Client.guilds.find(x => x.id == guild.id)
-    guilds.createChannel('Twice Fan Club')
-    guilds.createChannel('anime-info')
+    if (guilds.channels.find(x => x.name == 'twice-fan-club') == null) {
+        guilds.createChannel('twice-fan-club')
+    }
+    if (guilds.channels.find(x => x.name == 'anime-info') == null) {
+        guilds.createChannel('anime-info')
+    }
 })
 
 Client.on('message', recievedMessage => {
@@ -35,7 +39,11 @@ Client.on('message', recievedMessage => {
     }
     else if (recievedMessage.channel.name == 'anime-info') {
         purge()
-        anime.display(recievedMessage, Discord)
+        const user = Client.user
+        const test = {
+            user: Client.user.username
+        }
+        anime.display(recievedMessage, Client.user)
     }
 })
 
