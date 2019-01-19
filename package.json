@@ -1,0 +1,23 @@
+{
+  "name": "twice_bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js",
+    "dev": "nodemon bot.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord": "^0.8.2",
+    "discord.js": "^11.4.2",
+    "dotenv": "^6.2.0",
+    "ffmpeg-binaries": "^4.0.0",
+    "mal-scraper": "^2.4.5"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.9"
+  }
+}
