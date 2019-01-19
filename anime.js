@@ -25,6 +25,7 @@ function display(recievedMessage, user) {
 function animeEmbed(anime, user, command) {
     const kissAnime = `https://kissanime.ru/Anime/${anime.title.replace(":", '').split(' ').join('-')}`
     let title = ""
+    let trailer = anime.trailer ? `https://youtube.com/watch?v=${anime.trailer.match(/(?<=embed\/)(\d|\w)+/g)}` : undefined
     if (anime.title == anime.englishTitle || anime.englishTitle == '') {
         title = `Title: ${anime.title}`
     }
@@ -32,6 +33,9 @@ function animeEmbed(anime, user, command) {
         title = `English Title: ${anime.englishTitle}\n                         ${anime.title}`
     }
     title += `\nJapanese Title: ${anime.japaneseTitle}`
+    if (anime.trailer) {
+
+    }
     const embed = {
         embed: {
             author: {
@@ -45,7 +49,7 @@ function animeEmbed(anime, user, command) {
             fields: [
                 {
                     name: "Trailer",
-                    value: `[link](https://youtube.com/watch?v=${anime.trailer.match(/(?<=embed\/)(\d|\w)+/g)})`
+                    value: `[link](${trailer})`
                 },
                 {
                     name: "KissAnime",

@@ -1,6 +1,6 @@
 const Discord = require('discord.js')
 const Client = new Discord.Client()
-require('dotenv').config()
+if (process.env.NODE_ENV !== 'production') require('dotenv').config()
 const functions = require('./functions')
 const anime = require('./anime.js')
 
