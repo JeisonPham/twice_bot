@@ -2,6 +2,7 @@ const malScraper = require('mal-scraper')
 function display(recievedMessage, user) {
     const command = recievedMessage.content
     if (command.length >= 250) return
+    else if (command.indexOf('!season') == 0) seasonInfo(recievedMessage)
     else if (/myanimelist.net/.test(command)) {
         malScraper.getInfoFromURL(command)
             .then((data) => recievedMessage.channel.send(animeEmbed(data, user, command)))
@@ -71,6 +72,30 @@ function animeEmbed(anime, user, command) {
         }
     }
     return embed
+
+}
+
+function seasonInfo(command) {
+    const seasonInfo = command.content.replace("!season ", "").toLowerCase()
+    const season = seasonInfo.match(/(winter|spring|summer|fall)/gi)[0]
+    const year = seasonInfo.match(/\d{4}/g) ? seasonInfo.match(/\d{4}/g)[0] : new Date().getFullYear()
+
+    let filter = seasonInfo.replace(season, "").replace(year, "")
+    malScraper.getSeason(year, season)
+        .then(data => {
+            if (filter == "") {
+                let keys = []
+                for (let k in data) {
+                    keys.push(k)
+                }
+                for (let key in keys) {
+                    const showInfo = data[keys[0]].slice(0, 5)
+                    command.channel.send(showInfo.length > 0 ? "```First " + showInfo.length + " " + keys[key] + "  Results\n" + showInfo.map((x, i) => `${i + 1} ${x.title}\n`).join("") + "```" : "```There are no " + keys[key] + " shows for this season```")
+                }
+
+            }
+        })
+        .catch(err => console.log(err))
 
 }
 
