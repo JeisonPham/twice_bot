@@ -78,22 +78,45 @@ function animeEmbed(anime, user, command) {
 function seasonInfo(command) {
     const seasonInfo = command.content.replace("!season ", "").toLowerCase()
     const season = seasonInfo.match(/(winter|spring|summer|fall)/gi)[0]
-    const year = seasonInfo.match(/\d{4}/g) ? seasonInfo.match(/\d{4}/g)[0] : new Date().getFullYear()
+    const year = seasonInfo.match(/\d{4}/g) ? parseInt(seasonInfo.match(/\d{4}/g)[0]) : new Date().getFullYear()
+    const color = [1048142, 11718884, 15859712, 16737178, 16439902]
 
-    let filter = seasonInfo.replace(season, "").replace(year, "")
+    let filter = seasonInfo.replace(season, "").replace(year, "") + ""
     malScraper.getSeason(year, season)
         .then(data => {
-            if (filter == "") {
-                let keys = []
-                for (let k in data) {
-                    keys.push(k)
-                }
-                for (let key in keys) {
-                    const showInfo = data[keys[0]].slice(0, 5)
-                    command.channel.send(showInfo.length > 0 ? "```First " + showInfo.length + " " + keys[key] + "  Results\n" + showInfo.map((x, i) => `${i + 1} ${x.title}\n`).join("") + "```" : "```There are no " + keys[key] + " shows for this season```")
-                }
-
+            let keys = []
+            command.reply("Here are the results")
+            for (let k in data) {
+                keys.push(k)
             }
+            for (let key in keys) {
+                let embed = {}
+                if (filter == "" || filter == " ") {
+
+                }
+                else {
+                    if (filter.indexOf("score") != -1) {
+                        data[keys[key]].sort((a, b) => b.score - a.score)
+                    }
+
+                }
+                const showInfo = data[keys[key]].slice(0, 5)
+                embed = {
+                    embed: {
+                        color: color[key],
+                        title: showInfo.length > 0 ? `First ${showInfo.length} ${keys[key]} Result(s)` : `There are no ${keys[keys]} shows for this season`,
+                        fields: showInfo.map((x, i) => {
+                            return {
+                                name: `${i + 1} ${x.title}`,
+                                value: `[${x.synopsis.substring(0, 100)}...](${x.link})`
+                            }
+                        })
+                    }
+                }
+                command.channel.send(embed)
+            }
+
+
         })
         .catch(err => console.log(err))
 
