@@ -91,14 +91,9 @@ function seasonInfo(command) {
             }
             for (let key in keys) {
                 let embed = {}
-                if (filter == "" || filter == " ") {
 
-                }
-                else {
-                    if (filter.indexOf("score") != -1) {
-                        data[keys[key]].sort((a, b) => b.score - a.score)
-                    }
-
+                if (filter.indexOf("score") != -1) {
+                    data[keys[key]].sort((a, b) => b.score - a.score)
                 }
                 const showInfo = data[keys[key]].slice(0, 5)
                 embed = {
@@ -107,13 +102,14 @@ function seasonInfo(command) {
                         title: showInfo.length > 0 ? `First ${showInfo.length} ${keys[key]} Result(s)` : `There are no ${keys[keys]} shows for this season`,
                         fields: showInfo.map((x, i) => {
                             return {
-                                name: `${i + 1} ${x.title}`,
+                                name: `${i + 1}. ${x.title}`,
                                 value: `[${x.synopsis.substring(0, 100)}...](${x.link})`
                             }
                         })
                     }
                 }
                 command.channel.send(embed)
+
             }
 
 
