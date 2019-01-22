@@ -2,7 +2,7 @@ const malScraper = require('mal-scraper')
 function display(recievedMessage, user) {
     const command = recievedMessage.content
     if (command.length >= 250) return
-    else if (command.indexOf('!season') == 0) seasonInfo(recievedMessage)
+    else if (/^(!season)/gi.test(command)) seasonInfo(recievedMessage)
     else if (/myanimelist.net/.test(command)) {
         malScraper.getInfoFromURL(command)
             .then((data) => recievedMessage.channel.send(animeEmbed(data, user, command)))
@@ -81,7 +81,9 @@ function seasonInfo(command) {
     const year = seasonInfo.match(/\d{4}/g) ? parseInt(seasonInfo.match(/\d{4}/g)[0]) : new Date().getFullYear()
     const color = [1048142, 11718884, 15859712, 16737178, 16439902]
 
-    let filter = seasonInfo.replace(season, "").replace(year, "") + ""
+    let filter = seasonInfo.replace(season, "").replace(year, "").replace(' ', '') + ""
+    let searchResult = filter.match(/\d{1,}/gi)
+    searchResult = searchResult == null ? 5 : parseInt(searchResult[0])
     malScraper.getSeason(year, season)
         .then(data => {
             let keys = []
@@ -91,11 +93,16 @@ function seasonInfo(command) {
             }
             for (let key in keys) {
                 let embed = {}
-
-                if (filter.indexOf("score") != -1) {
-                    data[keys[key]].sort((a, b) => b.score - a.score)
+                let sorted = false
+                if (/(tv|ovas|movies|special|onas)/gi.test(filter) && filter.indexOf(keys[key].toLowerCase()) == -1) {
+                    continue
                 }
-                const showInfo = data[keys[key]].slice(0, 5)
+                if (filter.indexOf("score") != -1 && !sorted) {
+                    data[keys[key]].sort((a, b) => b.score - a.score)
+                    sorted = true
+                }
+
+                const showInfo = data[keys[key]].slice(0, searchResult)
                 embed = {
                     embed: {
                         color: color[key],

@@ -40,9 +40,6 @@ Client.on('message', recievedMessage => {
     else if (recievedMessage.channel.name == 'anime-info') {
         purge()
         const user = Client.user
-        const test = {
-            user: Client.user.username
-        }
         anime.display(recievedMessage, Client.user)
     }
 })
